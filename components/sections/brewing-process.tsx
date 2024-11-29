@@ -1,8 +1,8 @@
-import { Beer, Grain, Thermometer, Clock, Award } from "lucide-react"
+import { Beer, Leaf, Thermometer, Clock, Award } from "lucide-react"
 
 const steps = [
   {
-    icon: Grain,
+    icon: Leaf, // Substituímos Grain por Leaf
     title: "Seleção dos Ingredientes",
     description: "Escolhemos cuidadosamente os melhores maltes, lúpulos e leveduras."
   },
@@ -42,23 +42,26 @@ export function BrewingProcess() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-          {steps.map((step, index) => (
-            <div
-              key={step.title}
-              className="relative flex flex-col items-center p-6 bg-white rounded-lg shadow-md"
-            >
-              <div className="absolute -top-4 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold">
-                {index + 1}
+          {steps.map((step, index) => {
+            const Icon = step.icon // Atribuímos o componente do ícone
+            return (
+              <div
+                key={step.title}
+                className="relative flex flex-col items-center p-6 bg-white rounded-lg shadow-md"
+              >
+                <div className="absolute -top-4 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold">
+                  {index + 1}
+                </div>
+                <Icon className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600 text-center text-sm font-open-sans">
+                  {step.description}
+                </p>
               </div>
-              <step.icon className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">
-                {step.title}
-              </h3>
-              <p className="text-gray-600 text-center text-sm font-open-sans">
-                {step.description}
-              </p>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>
