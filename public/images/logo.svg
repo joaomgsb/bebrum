@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="50" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 40V0h200v40H120v10H80V40H0z" fill="currentColor"/>
+  <text x="20" y="30" fill="currentColor" font-family="Arial Black" font-size="24" font-weight="900">BEBRUM</text>
+  <text x="20" y="45" fill="currentColor" font-family="Arial" font-size="12">CERVEJARIA</text>
+</svg>
