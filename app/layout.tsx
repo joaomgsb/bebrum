@@ -1,38 +1,54 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { Playfair_Display, Open_Sans } from 'next/font/google'
-import { ThemeProvider } from '@/components/theme-provider'
-import { Navbar } from '@/components/layout/navbar'
-import { Footer } from '@/components/layout/footer'
+"use client";
 
-const playfair = Playfair_Display({ subsets: ['latin'] })
-const openSans = Open_Sans({ subsets: ['latin'], variable: '--font-open-sans' })
+import "./globals.css";
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
+import { usePathname } from "next/navigation";
+import { PageTransition } from "@/components/transitions/page-transition";
+import { Toaster } from "@/components/ui/toaster";
+import { SessionProvider } from "next-auth/react";
 
-export const metadata: Metadata = {
-  title: 'Cervejaria Bebrum - Tradição em Cerveja Artesanal',
-  description: 'Descubra o sabor único das cervejas artesanais Bebrum. Tradição, qualidade e paixão em cada gole.',
-  keywords: 'cerveja artesanal, cervejaria, bebrum, cerveja especial, brewery',
-}
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${playfair.className} ${openSans.variable}`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </ThemeProvider>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Cervejaria Bebrum",
+              "url": "https://bebrum.com.br",
+            }),
+          }}
+        />
+      </head>
+      <body className={inter.className}>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <Navbar />
+            <PageTransition key={pathname}>{children}</PageTransition>
+            <Footer />
+            <Toaster />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
-  )
+  );
 }

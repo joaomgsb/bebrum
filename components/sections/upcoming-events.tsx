@@ -1,48 +1,118 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Clock, MapPin, Users } from "lucide-react"
+import { Clock, MapPin, Users } from 'lucide-react'
+import { Skeleton } from "@/components/ui/skeleton"
 import Image from "next/image"
+import { formatDate } from "@/lib/utils"
 
-const events = [
-  {
-    id: 1,
-    title: "Workshop de Harmonização",
-    date: "27 de Abril, 2024",
-    time: "16:00 - 19:00",
-    location: "Cervejaria Bebrum",
-    capacity: "20 pessoas",
-    description: "Aprenda a harmonizar diferentes estilos de cerveja com pratos específicos. Inclui degustação de 6 cervejas e petiscos.",
-    price: "R$ 120,00",
-    image: "https://images.unsplash.com/photo-1559526324-593bc073d938?auto=format&fit=crop&q=80"
-  },
-  {
-    id: 2,
-    title: "Tour Cervejeiro",
-    date: "Todo Sábado",
-    time: "14:00 - 16:00",
-    location: "Cervejaria Bebrum",
-    capacity: "15 pessoas",
-    description: "Conheça todo o processo de fabricação das nossas cervejas artesanais, desde a seleção dos ingredientes até a degustação.",
-    price: "R$ 80,00",
-    image: "https://images.unsplash.com/photo-1584225064785-c62a8b43d148?auto=format&fit=crop&q=80"
-  },
-  {
-    id: 3,
-    title: "Festival de Cerveja Artesanal",
-    date: "18 de Maio, 2024",
-    time: "12:00 - 22:00",
-    location: "Cervejaria Bebrum",
-    capacity: "200 pessoas",
-    description: "Um dia inteiro dedicado à cerveja artesanal, com música ao vivo, food trucks e mais de 20 tipos de cerveja.",
-    price: "R$ 150,00",
-    image: "https://images.unsplash.com/photo-1436076863939-06870fe779c2?auto=format&fit=crop&q=80"
-  }
-]
+type Event = {
+  id: string
+  title: string
+  date: string
+  time: string
+  location: string
+  capacity: string
+  description: string
+  price: string
+  image: string
+  createdAt: string
+  updatedAt: string
+}
 
 export function UpcomingEvents() {
-  const [selectedEvent, setSelectedEvent] = useState(events[0])
+  const [events, setEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch("/api/events")
+      if (!response.ok) throw new Error("Falha ao carregar eventos")
+      
+      const data = await response.json()
+      
+      if (!Array.isArray(data)) {
+        throw new Error("Formato de dados inválido")
+      }
+      
+      setEvents(data)
+      setError(null)
+    } catch (error) {
+      console.error("Erro ao carregar eventos:", error)
+      setError("Não foi possível carregar os eventos")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
+  // Rest of the component remains the same...
+  if (loading) {
+    return (
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <Skeleton className="h-8 w-64 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-lg overflow-hidden shadow-lg">
+                <Skeleton className="h-48 w-full" />
+                <div className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-20 w-full" />
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-10 w-28" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (error) {
+    return (
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <Button 
+            onClick={() => {
+              setError(null)
+              setLoading(true)
+              fetchEvents()
+            }}
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      </section>
+    )
+  }
+
+  if (events.length === 0) {
+    return (
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-gray-500">
+            Nenhum evento programado no momento.
+          </p>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="py-24 bg-white">
@@ -60,10 +130,7 @@ export function UpcomingEvents() {
           {events.map((event) => (
             <div
               key={event.id}
-              className={`group rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-2 cursor-pointer ${
-                selectedEvent.id === event.id ? "ring-2 ring-primary" : ""
-              }`}
-              onClick={() => setSelectedEvent(event)}
+              className="group rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-2"
             >
               <div className="relative h-48">
                 <Image
@@ -75,8 +142,12 @@ export function UpcomingEvents() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-xl font-semibold text-white mb-2">{event.title}</h3>
-                  <p className="text-white/90 text-sm font-open-sans">{event.date}</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    {event.title}
+                  </h3>
+                  <p className="text-white/90 text-sm font-open-sans">
+                    {formatDate(event.date)}
+                  </p>
                 </div>
               </div>
 
@@ -115,3 +186,4 @@ export function UpcomingEvents() {
     </section>
   )
 }
+
